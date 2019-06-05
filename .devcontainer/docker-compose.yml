@@ -9,6 +9,9 @@ services:
       # Update this to wherever you want VS Code to mount the folder of your project
       - ..:/workspace
 
+      # Sets Maven repository folder
+      - ~/.m2:/root/.m2
+
       # Sets ssh folder
       #- ~/.ssh:/root/.ssh
 
