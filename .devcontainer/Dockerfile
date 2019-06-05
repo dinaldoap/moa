@@ -1,4 +1,4 @@
-FROM  maven:3.6.1-jdk-11-slim
+FROM  maven:3.6.1-jdk-8-slim
 
 # Copy endpoint specific user settings overrides into container to specify Java path
 COPY settings.vscode.json /root/.vscode-remote/data/Machine/settings.json
