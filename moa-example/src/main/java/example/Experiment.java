@@ -1,48 +1,33 @@
 package example;
 
-import java.io.IOException;
-
-import com.yahoo.labs.samoa.instances.Instance;
-
-import moa.classifiers.Classifier;
-import moa.classifiers.trees.HoeffdingTree;
 import moa.core.TimingUtils;
-import moa.streams.generators.RandomRBFGenerator;
+import moa.options.ClassOption;
+import moa.tasks.MainTask;
+import moa.tasks.TaskThread;
 
 public class Experiment {
 
-    public Experiment(){
+    public Experiment() {
     }
 
-    public void run(int numInstances, boolean isTesting){
-            Classifier learner = new HoeffdingTree();
-            RandomRBFGenerator stream = new RandomRBFGenerator();
-            stream.prepareForUse();
-
-            learner.setModelContext(stream.getHeader());
-            learner.prepareForUse();
-
-            int numberSamplesCorrect = 0;
-            int numberSamples = 0;
-            long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-            while (stream.hasMoreInstances() && numberSamples < numInstances) {
-                    Instance trainInst = stream.nextInstance().getData();
-                    if (isTesting) {
-                            if (learner.correctlyClassifies(trainInst)){
-                                    numberSamplesCorrect++;
-                            }
-                    }
-                    numberSamples++;
-                    learner.trainOnInstance(trainInst);
-            }
-            double accuracy = 100.0 * (double) numberSamplesCorrect/ (double) numberSamples;
-            double time = TimingUtils.nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread()- evaluateStartTime);
-            System.out.println(numberSamples + " instances processed with " + accuracy + "% accuracy in "+time+" seconds.");
+    public void run(int numInstances, boolean isTesting) throws Exception {
+        long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
+        String task = "EvaluatePrequential -l bayes.NaiveBayes"
+                + " -s (ConceptDriftStream -s (generators.SEAGenerator -f 3) -d (generators.SEAGenerator -f 2) -p 50000 -w 20000)"
+                + " -e (FadingFactorClassificationPerformanceEvaluator)"
+                + " -i 100000 -f 1000 -d data/results.csv";
+        System.out.println(task);
+        MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
+        TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
+        thread.start();
+        double time = TimingUtils
+                .nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread() - evaluateStartTime);
+        System.out.println(time + " seconds.");
     }
 
-    public static void main(String[] args) throws IOException {
-            System.out.println("Experiment started!");
-            Experiment exp = new Experiment();
-            exp.run(1000000, true);
+    public static void main(String[] args) throws Exception {
+        System.out.println("Experiment started!");
+        Experiment exp = new Experiment();
+        exp.run(1000000, true);
     }
 }
