@@ -11,7 +11,7 @@ public class Experiment {
     public Experiment() {
     }
 
-    public void run(int numInstances, boolean isTesting) throws Exception {
+    public void run() throws Exception {
         cleanUp();
         long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
         String task = "EvaluatePrequential -l bayes.NaiveBayes"
@@ -34,6 +34,6 @@ public class Experiment {
     public static void main(String[] args) throws Exception {
         System.out.println("Experiment started!");
         Experiment exp = new Experiment();
-        exp.run(1000000, true);
+        exp.run();
     }
 }
