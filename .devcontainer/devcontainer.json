@@ -1,22 +1,41 @@
 {
-	"name": "Java Example",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "java",
-	"workspaceFolder": "/workspace",
-
-	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
-	// "shutdownAction": "none",
-
-	// Uncomment the next line to run commands after the container is created.
-	// "postCreateCommand": "docker --version"
-
-	"extensions": [
-		"peterjausovec.vscode-docker",
-		"vscjava.vscode-java-pack"
-	],
-	"settings": {
-		"remote.extensionKind": {
-			"peterjausovec.vscode-docker": "workspace"
-		}
-	}
+    "name": "Java Example",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "java",
+    "workspaceFolder": "/workspace",
+    // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
+    // "shutdownAction": "none",
+    // Uncomment the next line to run commands after the container is created.
+    // "postCreateCommand": "docker --version"
+    "extensions": [
+        "peterjausovec.vscode-docker",
+        "vscjava.vscode-java-pack"
+    ],
+    "settings": {
+        // Docker
+        "remote.extensionKind": {
+            "peterjausovec.vscode-docker": "workspace"
+        },
+        // Java and Maven
+        "java.configuration.updateBuildConfiguration": "automatic",
+        // Save
+        "files.autoSave": "afterDelay",
+        // Import
+        // Conflict between Format and Organize Import on Save
+        // https://github.com/prettier/prettier-vscode/issues/716
+        //"editor.codeActionsOnSave": {
+        //	"source.organizeImports": true
+        //},
+        // Format
+        "editor.formatOnSave": true,
+        "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+        "editor.detectIndentation": false,
+        // Ignore files
+        "files.exclude": {
+            "**/.classpath": true,
+            "**/.project": true,
+            "**/.settings": true,
+            "**/.factorypath": true
+        }
+    }
 }
