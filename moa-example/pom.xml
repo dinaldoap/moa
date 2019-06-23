@@ -10,13 +10,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>nz.ac.waikato.cms.moa</groupId>
             <artifactId>moa</artifactId>
             <version>2019.05.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.6</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
