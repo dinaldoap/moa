@@ -64,7 +64,7 @@ public class InputStreamGenerator {
 
     private void noDrift() throws Exception {
         System.out.println("No drift generation started!");
-        String task = "WriteStreamToARFFFile -s generators.SEAGenerator -f 3"
+        String task = "WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0)"
                 + " -f data/stream/no_concept_drift.arff -m 100000";
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
@@ -74,7 +74,7 @@ public class InputStreamGenerator {
     private void gradualDrift() throws Exception {
         System.out.println("Gradual drift generation started!");
         String task =
-                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3) -d (generators.SEAGenerator -f 2) -p 50000 -w 20000)"
+                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0) -d (generators.SEAGenerator -f 2 -p 0) -p 50000 -w 20000)"
                         + " -f data/stream/gradual_concept_drift.arff -m 100000";
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
