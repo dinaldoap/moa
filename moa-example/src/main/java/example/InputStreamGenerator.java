@@ -2,7 +2,9 @@ package example;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import moa.options.ClassOption;
 import moa.tasks.MainTask;
 import moa.tasks.TaskThread;
@@ -10,14 +12,27 @@ import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 
 public class InputStreamGenerator {
+    private static final String NO_CONCEPT_DRIFT = "no_concept_drift";
+    private static final String GRADUAL_CONCEPT_DRIFT = "gradual_concept_drift";
+    private static final List<String> PROJECTS =
+            Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo", "postgres");
+    public static final List<String> STREAMS =
+            union(Arrays.asList(NO_CONCEPT_DRIFT, GRADUAL_CONCEPT_DRIFT), PROJECTS);
+
     public InputStreamGenerator() {
+    }
+
+    private static List<String> union(List<String> list1, List<String> list2) {
+        List<String> union = new ArrayList<String>(list1.size() + list2.size());
+        union.addAll(list1);
+        union.addAll(list2);
+        return union;
     }
 
     public void run() throws Exception {
         noDrift();
         gradualDrift();
-        for (String project : Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo",
-                "postgres")) {
+        for (String project : PROJECTS) {
             preprocess(project);
             realDrifts(project);
         }
