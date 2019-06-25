@@ -23,9 +23,11 @@ public class InputStreamGenerator {
     private void preprocess() throws IOException {
         System.out.println("Commit data preprocessing started!");
         RawDataReader reader = new RawDataReader();
+        reader.setSource("mongo");
 
         PreprocessorWriter preprocessor = new PreprocessorWriter();
         preprocessor.setInput(reader);
+        preprocessor.setTarget("mongo");
         preprocessor.write();
         System.out.println("Commit data preprocessing ended!");
     }

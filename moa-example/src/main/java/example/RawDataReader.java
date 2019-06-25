@@ -11,14 +11,22 @@ import org.apache.commons.csv.CSVRecord;
 
 public class RawDataReader {
 
+    private String source;
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     public void read(Consumer<? super CSVRecord> consumer) {
         try {
-            BufferedReader reader = Files.newBufferedReader(Paths.get("data/raw/mongo.csv"));
+            BufferedReader reader = Files
+                    .newBufferedReader(Paths.get(String.format("data/raw/%s.csv", this.source)));
             CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
             parser.forEach(consumer);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
 }

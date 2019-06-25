@@ -15,6 +15,7 @@ import org.apache.commons.csv.CSVRecord;
 public class PreprocessorWriter implements Consumer<CSVRecord> {
 
     private RawDataReader input;
+    private String target;
     private CSVPrinter csvPrinter;
     private static final List<String> COLUMNS = Arrays.asList("fix", "ns", "nd", "nf", "entropy",
             "la", "ld", "lt", "ndev", "age", "nuc", "exp", "rexp", "sexp",
@@ -25,6 +26,11 @@ public class PreprocessorWriter implements Consumer<CSVRecord> {
         this.input = input;
     }
 
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
     public void write() {
         init();
         this.input.read(this);
@@ -33,8 +39,8 @@ public class PreprocessorWriter implements Consumer<CSVRecord> {
 
     private void init() {
         try {
-            BufferedWriter writer =
-                    Files.newBufferedWriter(Paths.get("data/preprocessed/mongo.csv"));
+            BufferedWriter writer = Files.newBufferedWriter(
+                    Paths.get(String.format("data/preprocessed/%s.csv", this.target)));
             this.csvPrinter = new CSVPrinter(writer,
                     CSVFormat.DEFAULT.withHeader(COLUMNS.toArray(new String[COLUMNS.size()])));
         } catch (IOException e) {
