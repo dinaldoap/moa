@@ -2,6 +2,7 @@ package example;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import moa.core.TimingUtils;
 import moa.options.ClassOption;
 import moa.tasks.MainTask;
@@ -15,34 +16,35 @@ public class InputStreamGenerator {
 
     public void run() throws Exception {
         gradualDrift();
-        preprocess();
-        realDrifts();
+        for (String project : Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo",
+                "postgres")) {
+            preprocess(project);
+            realDrifts(project);
+        }
     }
 
 
-    private void preprocess() throws IOException {
-        System.out.println("Commit data preprocessing started!");
+    private void preprocess(String project) throws IOException {
+        System.out.println(String.format("%s's commit data preprocessing started!", project));
         RawDataReader reader = new RawDataReader();
-        reader.setSource("mongo");
+        reader.setSource(project);
 
         PreprocessorWriter preprocessor = new PreprocessorWriter();
         preprocessor.setInput(reader);
-        preprocessor.setTarget("mongo");
+        preprocessor.setTarget(project);
         preprocessor.write();
-        System.out.println("Commit data preprocessing ended!");
     }
 
-    private void realDrifts() throws IOException {
-        System.out.println("Real drifts generation started!");
+    private void realDrifts(String project) throws IOException {
+        System.out.println(String.format("%s's real drifts generation started!", project));
         CSVLoader loader = new CSVLoader();
-        loader.setSource(new File("data/preprocessed/mongo.csv"));
+        loader.setSource(new File(String.format("data/preprocessed/%s.csv", project)));
         weka.core.Instances data = loader.getDataSet();
 
         ArffSaver saver = new ArffSaver();
         saver.setInstances(data);
-        saver.setFile(new File("data/stream/mongo.arff"));
+        saver.setFile(new File((String.format("data/stream/%s.arff", project))));
         saver.writeBatch();
-        System.out.println("Real drifts generation ended!");
     }
 
     private void gradualDrift() throws Exception {
