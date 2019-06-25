@@ -3,7 +3,6 @@ package example;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import moa.core.TimingUtils;
 import moa.options.ClassOption;
 import moa.tasks.MainTask;
 import moa.tasks.TaskThread;
@@ -15,6 +14,7 @@ public class InputStreamGenerator {
     }
 
     public void run() throws Exception {
+        noDrift();
         gradualDrift();
         for (String project : Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo",
                 "postgres")) {
@@ -47,19 +47,23 @@ public class InputStreamGenerator {
         saver.writeBatch();
     }
 
-    private void gradualDrift() throws Exception {
-        System.out.println("Gradual drift generation started!");
-        long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-        String task =
-                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3) -d (generators.SEAGenerator -f 2) -p 50000 -w 20000)"
-                        + " -f data/stream/gradual_concept_drift.arff -m 100000";
-        System.out.println(task);
+    private void noDrift() throws Exception {
+        System.out.println("No drift generation started!");
+        String task = "WriteStreamToARFFFile -s generators.SEAGenerator -f 3"
+                + " -f data/stream/no_concept_drift.arff -m 100000";
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
         thread.start();
-        double time = TimingUtils
-                .nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread() - evaluateStartTime);
-        System.out.println(time + " seconds.");
+    }
+
+    private void gradualDrift() throws Exception {
+        System.out.println("Gradual drift generation started!");
+        String task =
+                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3) -d (generators.SEAGenerator -f 2) -p 50000 -w 20000)"
+                        + " -f data/stream/gradual_concept_drift.arff -m 100000";
+        MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
+        TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
+        thread.start();
     }
 
     public static void main(String[] args) throws Exception {
