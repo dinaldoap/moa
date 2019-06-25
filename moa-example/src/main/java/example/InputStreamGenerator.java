@@ -19,31 +19,31 @@ public class InputStreamGenerator {
 
     public void run() throws Exception {
         gradualDrift();
-        commitGuru2features();
+        preprocess();
         realDrifts();
     }
 
 
-    private void commitGuru2features() throws IOException {
-        System.out.println("Features generation started!");
+    private void preprocess() throws IOException {
+        System.out.println("Commit data preprocessing started!");
         CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
-                .parse(Files.newBufferedReader(Paths.get("data/spark.csv")));
-        CommitGuru2Features commitGuru2Features = new CommitGuru2Features();
-        parser.forEach(commitGuru2Features);
-        commitGuru2Features.close();
+                .parse(Files.newBufferedReader(Paths.get("data/raw/mongo.csv")));
+        Preprocessor preprocessor = new Preprocessor();
+        parser.forEach(preprocessor);
+        preprocessor.close();
         parser.close();
-        System.out.println("Features generation ended!");
+        System.out.println("Commit data preprocessing ended!");
     }
 
     private void realDrifts() throws IOException {
         System.out.println("Real drifts generation started!");
         CSVLoader loader = new CSVLoader();
-        loader.setSource(new File("data/spark_features.csv"));
+        loader.setSource(new File("data/preprocessed/mongo.csv"));
         weka.core.Instances data = loader.getDataSet();
 
         ArffSaver saver = new ArffSaver();
         saver.setInstances(data);
-        saver.setFile(new File("data/spark.arff"));
+        saver.setFile(new File("data/stream/mongo.arff"));
         saver.writeBatch();
         System.out.println("Real drifts generation ended!");
     }
@@ -53,7 +53,7 @@ public class InputStreamGenerator {
         long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
         String task =
                 "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3) -d (generators.SEAGenerator -f 2) -p 50000 -w 20000)"
-                        + " -f data/gradual_concept_drift.arff -m 100000";
+                        + " -f data/stream/gradual_concept_drift.arff -m 100000";
         System.out.println(task);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);

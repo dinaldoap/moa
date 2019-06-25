@@ -15,9 +15,9 @@ public class Experiment {
         cleanUp();
         long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
         String task = "EvaluatePrequential -l bayes.NaiveBayes"
-                + " -s (ArffFileStream -f data/gradual_concept_drift.arff -c -1)"
+                + " -s (ArffFileStream -f data/stream/mongo.arff -c -1)"
                 + " -e (FadingFactorClassificationPerformanceEvaluator -r)"
-                + " -i 100000 -f 1000 -d data/results.csv";
+                + " -i 100000 -f 1 -d data/evaluation/mongo.csv";
         System.out.println(task);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);

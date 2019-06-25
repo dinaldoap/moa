@@ -12,7 +12,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
-public class CommitGuru2Features implements Consumer<CSVRecord> {
+public class Preprocessor implements Consumer<CSVRecord> {
 
     private CSVPrinter csvPrinter;
     private static final List<String> COLUMNS = Arrays.asList("fix", "ns", "nd", "nf", "entropy",
@@ -21,9 +21,10 @@ public class CommitGuru2Features implements Consumer<CSVRecord> {
 
 
 
-    public CommitGuru2Features() {
+    public Preprocessor() {
         try {
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get("data/spark_features.csv"));
+            BufferedWriter writer =
+                    Files.newBufferedWriter(Paths.get("data/preprocessed/mongo.csv"));
             this.csvPrinter = new CSVPrinter(writer,
                     CSVFormat.DEFAULT.withHeader(COLUMNS.toArray(new String[COLUMNS.size()])));
         } catch (IOException e) {
