@@ -12,16 +12,26 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
-public class Preprocessor implements Consumer<CSVRecord> {
+public class PreprocessorWriter implements Consumer<CSVRecord> {
 
+    private RawDataReader input;
     private CSVPrinter csvPrinter;
     private static final List<String> COLUMNS = Arrays.asList("fix", "ns", "nd", "nf", "entropy",
             "la", "ld", "lt", "ndev", "age", "nuc", "exp", "rexp", "sexp",
             "author_date_unix_timestamp", "classification", "contains_bug");
 
 
+    public void setInput(RawDataReader input) {
+        this.input = input;
+    }
 
-    public Preprocessor() {
+    public void write() {
+        init();
+        this.input.read(this);
+        close();
+    }
+
+    private void init() {
         try {
             BufferedWriter writer =
                     Files.newBufferedWriter(Paths.get("data/preprocessed/mongo.csv"));
@@ -47,7 +57,7 @@ public class Preprocessor implements Consumer<CSVRecord> {
         }
     }
 
-    public void close() {
+    private void close() {
         try {
             this.csvPrinter.close();
         } catch (IOException e) {

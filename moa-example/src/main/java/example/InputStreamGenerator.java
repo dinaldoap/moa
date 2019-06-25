@@ -2,10 +2,6 @@ package example;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import moa.core.TimingUtils;
 import moa.options.ClassOption;
 import moa.tasks.MainTask;
@@ -26,12 +22,11 @@ public class InputStreamGenerator {
 
     private void preprocess() throws IOException {
         System.out.println("Commit data preprocessing started!");
-        CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
-                .parse(Files.newBufferedReader(Paths.get("data/raw/mongo.csv")));
-        Preprocessor preprocessor = new Preprocessor();
-        parser.forEach(preprocessor);
-        preprocessor.close();
-        parser.close();
+        RawDataReader reader = new RawDataReader();
+
+        PreprocessorWriter preprocessor = new PreprocessorWriter();
+        preprocessor.setInput(reader);
+        preprocessor.write();
         System.out.println("Commit data preprocessing ended!");
     }
 
