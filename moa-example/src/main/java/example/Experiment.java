@@ -8,25 +8,26 @@ import moa.tasks.TaskThread;
 
 public class Experiment {
 
-    public Experiment() {
-    }
-
     public void run() throws Exception {
-        for (String stream : InputStreamGenerator.STREAMS) {
-            cleanUp(stream);
-            long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-            String task = String.format("EvaluatePrequential -l bayes.NaiveBayes"
-                    + " -s (ArffFileStream -f data/stream/%1$s.arff -c -1)"
-                    + " -e (FadingFactorClassificationPerformanceEvaluator -r)"
-                    + " -i 100000 -f 1 -d data/evaluation/%1$s.csv", stream);
-            System.out.println(task);
-            MainTask currentTask =
-                    (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
-            TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
-            thread.start();
-            double time = TimingUtils.nanoTimeToSeconds(
-                    TimingUtils.getNanoCPUTimeOfCurrentThread() - evaluateStartTime);
-            System.out.println(time + " seconds.");
+        for (ClassifierEnum classifier : ClassifierEnum.values()) {
+            for (String stream : InputStreamGenerator.STREAMS) {
+                cleanUp(stream);
+                long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
+                String task = String.format(
+                        "EvaluatePrequential -l (%2$s)"
+                                + " -s (ArffFileStream -f data/stream/%1$s.arff -c -1)"
+                                + " -e (FadingFactorClassificationPerformanceEvaluator -r)"
+                                + " -i 100000 -f 1 -d data/evaluation/%3$s/%1$s.csv",
+                        stream, classifier.getCommand(), classifier.getName());
+                System.out.println(task);
+                MainTask currentTask =
+                        (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
+                TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
+                thread.start();
+                double time = TimingUtils.nanoTimeToSeconds(
+                        TimingUtils.getNanoCPUTimeOfCurrentThread() - evaluateStartTime);
+                System.out.println(time + " seconds.");
+            }
         }
     }
 
