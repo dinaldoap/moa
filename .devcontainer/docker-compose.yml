@@ -29,4 +29,11 @@ services:
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity 
-    
+
+  r-notebook:
+    image: "jupyter/r-notebook:d4cbf2f80a2a"
+    ports:
+      - "8888:8888"
+    volumes:
+      - "${PWD}:/home/jovyan/work"
+    command: start.sh jupyter lab --LabApp.token=''    
