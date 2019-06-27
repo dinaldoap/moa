@@ -74,7 +74,7 @@ public class InputStreamGenerator {
         System.out.println(String.format("%s generation started!", NO_DRIFT_BALANCED));
         String task =
                 String.format("WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0 -b)"
-                        + " -f data/stream/%s.arff -m 100000", NO_DRIFT_BALANCED);
+                        + " -f data/stream/%s.arff -m 50000", NO_DRIFT_BALANCED);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
     }
@@ -82,8 +82,8 @@ public class InputStreamGenerator {
     private void gradualDrift() throws Exception {
         System.out.println(String.format("%s generation started!", GRADUAL_DRIFT));
         String task = String.format(
-                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0 -b) -d (generators.SEAGenerator -f 2 -p 0 -b) -p 50000 -w 20000)"
-                        + " -f data/stream/%s.arff -m 100000",
+                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0 -b) -d (generators.SEAGenerator -f 2 -p 0 -b) -p 25000 -w 10000)"
+                        + " -f data/stream/%s.arff -m 50000",
                 GRADUAL_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
@@ -92,7 +92,7 @@ public class InputStreamGenerator {
     private void imbalanced() throws Exception {
         System.out.println(String.format("%s generation started!", IMBALANCED));
         String task = String.format("WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0)"
-                + " -f data/stream/%s.arff -m 100000", IMBALANCED);
+                + " -f data/stream/%s.arff -m 50000", IMBALANCED);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
     }
