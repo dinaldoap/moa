@@ -8,14 +8,10 @@
     // Uncomment the next line to run commands after the container is created.
     // "postCreateCommand": "docker --version"
     "extensions": [
-        "peterjausovec.vscode-docker",
+        "ms-azuretools.vscode-docker",
         "vscjava.vscode-java-pack"
     ],
     "settings": {
-        // Docker
-        "remote.extensionKind": {
-            "peterjausovec.vscode-docker": "workspace"
-        },
         // Java and Maven
         "java.configuration.updateBuildConfiguration": "automatic",
         // Save
