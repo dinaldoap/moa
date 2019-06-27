@@ -7,17 +7,20 @@ import java.util.Arrays;
 import java.util.List;
 import moa.options.ClassOption;
 import moa.tasks.MainTask;
-import moa.tasks.TaskThread;
+import weka.core.Instances;
+import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
+import weka.core.converters.CSVSaver;
 
 public class InputStreamGenerator {
     private static final String NO_CONCEPT_DRIFT = "no_concept_drift";
     private static final String GRADUAL_CONCEPT_DRIFT = "gradual_concept_drift";
+    private static final List<String> SYNTHETICS =
+            Arrays.asList(NO_CONCEPT_DRIFT, GRADUAL_CONCEPT_DRIFT);
     private static final List<String> PROJECTS =
             Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo", "postgres");
-    public static final List<String> STREAMS =
-            union(Arrays.asList(NO_CONCEPT_DRIFT, GRADUAL_CONCEPT_DRIFT), PROJECTS);
+    public static final List<String> STREAMS = union(SYNTHETICS, PROJECTS);
 
     public InputStreamGenerator() {
     }
@@ -32,6 +35,9 @@ public class InputStreamGenerator {
     public void run() throws Exception {
         noDrift();
         gradualDrift();
+        for (String synthetic : SYNTHETICS) {
+            arff2Csv(synthetic);
+        }
         for (String project : PROJECTS) {
             preprocess(project);
             realDrifts(project);
@@ -64,21 +70,32 @@ public class InputStreamGenerator {
 
     private void noDrift() throws Exception {
         System.out.println("No drift generation started!");
-        String task = "WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0)"
-                + " -f data/stream/no_concept_drift.arff -m 100000";
+        String task = String.format("WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0)"
+                + " -f data/stream/%s.arff -m 100000", NO_CONCEPT_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
-        TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
-        thread.start();
+        currentTask.doTask();
     }
 
     private void gradualDrift() throws Exception {
         System.out.println("Gradual drift generation started!");
-        String task =
+        String task = String.format(
                 "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0) -d (generators.SEAGenerator -f 2 -p 0) -p 50000 -w 20000)"
-                        + " -f data/stream/gradual_concept_drift.arff -m 100000";
+                        + " -f data/stream/%s.arff -m 100000",
+                GRADUAL_CONCEPT_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
-        TaskThread thread = new TaskThread((moa.tasks.Task) currentTask);
-        thread.start();
+        currentTask.doTask();
+    }
+
+    private void arff2Csv(String baseName) throws IOException {
+        System.out.println(String.format("%s's arff2csv started!", baseName));
+        ArffLoader loader = new ArffLoader();
+        loader.setSource(new File(String.format("data/stream/%s.arff", baseName)));
+        Instances data = loader.getDataSet();
+
+        CSVSaver saver = new CSVSaver();
+        saver.setInstances(data);
+        saver.setFile(new File(String.format("data/preprocessed/%s.csv", baseName)));
+        saver.writeBatch();
     }
 
     public static void main(String[] args) throws Exception {
