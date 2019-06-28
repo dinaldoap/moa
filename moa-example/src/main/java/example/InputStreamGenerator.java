@@ -14,11 +14,11 @@ import weka.core.converters.CSVLoader;
 import weka.core.converters.CSVSaver;
 
 public class InputStreamGenerator {
-    private static final String NO_DRIFT_BALANCED = "no_drift_balanced";
-    private static final String GRADUAL_DRIFT = "gradual_drift";
-    private static final String IMBALANCED = "imbalanced";
+    private static final String NO_DRIFT = "no_drift_balanced";
+    private static final String MAXIMUM_LIKELIHOOD_DRIFT = "maximum_likelihood_drift";
+    private static final String A_PRIORI_DRIFT = "a_priori_drift";
     private static final List<String> SYNTHETICS =
-            Arrays.asList(NO_DRIFT_BALANCED, GRADUAL_DRIFT, IMBALANCED);
+            Arrays.asList(NO_DRIFT, MAXIMUM_LIKELIHOOD_DRIFT, A_PRIORI_DRIFT);
     private static final List<String> PROJECTS =
             Arrays.asList("pip", "scikit-learn", "jenkins", "ant", "mongo", "postgres");
     public static final List<String> STREAMS = union(SYNTHETICS, PROJECTS);
@@ -35,8 +35,8 @@ public class InputStreamGenerator {
 
     public void run() throws Exception {
         noDriftBalanced();
-        gradualDrift();
-        imbalanced();
+        maximumLikelihoodDrift();
+        aPrioriDrift();
         for (String synthetic : SYNTHETICS) {
             arff2Csv(synthetic);
         }
@@ -71,28 +71,30 @@ public class InputStreamGenerator {
     }
 
     private void noDriftBalanced() throws Exception {
-        System.out.println(String.format("%s generation started!", NO_DRIFT_BALANCED));
+        System.out.println(String.format("%s generation started!", NO_DRIFT));
         String task =
                 String.format("WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0 -b)"
-                        + " -f data/stream/%s.arff -m 50000", NO_DRIFT_BALANCED);
+                        + " -f data/stream/%s.arff -m 50000", NO_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
     }
 
-    private void gradualDrift() throws Exception {
-        System.out.println(String.format("%s generation started!", GRADUAL_DRIFT));
+    private void maximumLikelihoodDrift() throws Exception {
+        System.out.println(String.format("%s generation started!", MAXIMUM_LIKELIHOOD_DRIFT));
         String task = String.format(
                 "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0 -b) -d (generators.SEAGenerator -f 2 -p 0 -b) -p 25000 -w 10000)"
                         + " -f data/stream/%s.arff -m 50000",
-                GRADUAL_DRIFT);
+                MAXIMUM_LIKELIHOOD_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
     }
 
-    private void imbalanced() throws Exception {
-        System.out.println(String.format("%s generation started!", IMBALANCED));
-        String task = String.format("WriteStreamToARFFFile -s (generators.SEAGenerator -f 3 -p 0)"
-                + " -f data/stream/%s.arff -m 50000", IMBALANCED);
+    private void aPrioriDrift() throws Exception {
+        System.out.println(String.format("%s generation started!", A_PRIORI_DRIFT));
+        String task = String.format(
+                "WriteStreamToARFFFile -s (ConceptDriftStream -s (generators.SEAGenerator -f 3 -p 0 -b) -d (generators.SEAGenerator -f 3 -p 0) -p 25000 -w 10000)"
+                        + " -f data/stream/%s.arff -m 50000",
+                A_PRIORI_DRIFT);
         MainTask currentTask = (MainTask) ClassOption.cliStringToObject(task, MainTask.class, null);
         currentTask.doTask();
     }
